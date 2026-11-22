@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Network Explorer – Computer Networks</title>
+<meta name="author" content="Maryam Ibrahim Hassanein">
+<style>
+:root{--bg:#070d24;--panel:#0e1a3d;--panel2:#13244f;--line:#25397a;--blue:#2f6bff;--cyan:#22d3ee;--vio:#a78bfa;--ok:#34d399;--bad:#fb7185;--gold:#fbbf24;--tx:#e8eeff;--mut:#9fb0dd}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.65 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+h1{font-size:2rem;line-height:1.2;margin:.2em 0 .5em}h2{font-size:1.3rem;margin:1.4em 0 .4em}h3{margin:.2em 0}
+p{margin:.5em 0;max-width:70ch}
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+aside{position:sticky;top:0;height:100vh;background:#091433;border-right:1px solid var(--line);padding:18px 14px;display:flex;flex-direction:column;gap:6px;overflow-y:auto}
+.brand{font-weight:800;font-size:1.15rem;margin-bottom:8px}.brand span{color:var(--cyan)}
+aside button.nv{background:none;border:0;color:var(--mut);text-align:left;padding:9px 10px;border-radius:8px;font:inherit;font-size:.95rem;cursor:pointer;border-left:3px solid transparent}
+aside button.nv:hover{background:var(--panel)}aside button.nv.on{background:var(--panel2);color:#fff;border-left-color:var(--cyan)}
+aside button.nv.ck::after{content:" ✓";color:var(--ok)}
+.pg{margin-top:auto;font-size:.85rem;color:var(--mut)}.bar{height:8px;background:var(--panel2);border-radius:4px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .5s}
+main{padding:28px clamp(16px,4vw,48px) 60px;max-width:1000px;width:100%}
+section{display:none}section.on{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;margin:14px 0}
+.def{border-left:4px solid var(--cyan);background:var(--panel2);padding:14px 18px;border-radius:0 10px 10px 0;margin:14px 0;font-size:1.05rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:10px 18px;font:inherit;font-weight:600;cursor:pointer}
+.btn:hover{background:#4a80ff}.btn.g{background:transparent;border:1px solid var(--line);color:var(--tx)}.btn.g.on{background:var(--panel2);border-color:var(--cyan)}.btn:disabled{opacity:.4;cursor:default}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;align-items:center}
+.hero h1{font-size:2.6rem}.sub{font-size:1.15rem;color:var(--mut)}
+.ic *{fill:none;stroke:#7fd8ff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.ic rect{fill:#13244f}.ic .f{fill:var(--cyan);stroke:none}
+svg{max-width:100%}
+.comp{display:grid;grid-template-columns:130px 1fr;gap:16px;align-items:start}
+.comp svg{width:120px;background:var(--panel2);border-radius:10px;padding:8px}
+.tag{display:inline-block;font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:20px;background:var(--panel2);color:var(--cyan)}
+.qz{border-top:1px dashed var(--line);margin-top:12px;padding-top:10px}.qz button{display:block;width:100%;text-align:left;margin:6px 0;background:var(--panel2);border:1px solid var(--line);color:var(--tx);padding:9px 12px;border-radius:8px;font:inherit;cursor:pointer}
+.qz button.ok{border-color:var(--ok);background:#0f3a33}.qz button.no{border-color:var(--bad);background:#3d1626}.qz small{display:block;color:var(--mut)}
+.ans{font-size:.95rem;margin-top:6px}.ok-t{color:var(--ok)}.bad-t{color:var(--bad)}
+.nx{display:flex;justify-content:space-between;gap:10px;margin-top:30px;flex-wrap:wrap}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.pal .btn{padding:8px 12px;font-size:.92rem}
+.cvw{background:radial-gradient(circle at 30% 20%,#12235a,#0a1330);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+#cv{display:block;width:100%;height:auto;aspect-ratio:800/440;touch-action:none;user-select:none}
+#cv text{fill:#e8eeff;font-size:19px;font-weight:600;text-anchor:middle;pointer-events:none}
+#cv g[data-n]{cursor:grab}
+#fb{min-height:64px}#fb.ok{border-color:var(--ok)}#fb.bad{border-color:var(--bad)}
+.legend{font-size:.88rem;color:var(--mut)}
+.badge{display:inline-block;margin:4px;padding:8px 14px;border:1px solid var(--line);border-radius:8px;opacity:.4}.badge.on{opacity:1;border-color:var(--gold);color:var(--gold)}
+.cert{border:2px solid var(--gold);padding:24px;border-radius:10px;text-align:center;margin:16px 0}
+input[type=text]{background:var(--panel2);border:1px solid var(--line);color:var(--tx);padding:9px 12px;border-radius:8px;font:inherit}
+ol.st{padding-left:22px}ol.st li{padding:3px 8px;border-radius:6px;color:var(--mut)}ol.st li.on{background:var(--panel2);color:#fff}
+.chip{display:inline-block;padding:2px 12px;border-radius:20px;font-weight:700;font-size:.85rem}.chip.q{background:#0b4a5c;color:var(--cyan)}.chip.r{background:#3b2a7a;color:var(--vio)}
+@media(max-width:820px){
+.app{grid-template-columns:1fr}
+aside{position:sticky;height:auto;flex-direction:row;align-items:center;overflow-x:auto;z-index:9;padding:8px;gap:4px;border-right:0;border-bottom:1px solid var(--line)}
+aside button.nv{white-space:nowrap;border-left:0;border-bottom:3px solid transparent;padding:8px}aside button.nv.on{border-bottom-color:var(--cyan)}
+.brand,.pg .tx{display:none}.pg{margin:0 0 0 auto;min-width:90px}
+.hero{grid-template-columns:1fr}.hero h1{font-size:2rem}.comp{grid-template-columns:1fr}body{font-size:16px}}
+@media print{aside,.noprint{display:none!important}body{background:#fff;color:#000}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside id="nav">
+ <div class="brand">Network <span>Explorer</span></div>
+ <div class="pg"><div class="tx"><b id="xp">0</b> XP · <span id="pct">0%</span> complete</div><div class="bar"><i id="pbar"></i></div></div>
+</aside>
+<main>
+
+<!-- HOME -->
+<section id="home" class="on">
+ <div class="hero"><div>
+  <h1>Welcome to Network Explorer!</h1>
+  <p class="sub">Discover how computers connect, communicate, and share information.</p>
+  <p><b>Lesson time:</b> about 30 minutes. <b>Level:</b> Grade 6.</p>
+  <button class="btn" onclick="go('s1')">Start Learning</button>
+ </div><div id="heroSvg"></div></div>
+ <h2>What you will learn</h2>
+ <div class="card"><ol>
+  <li>Identify and describe the components of a computer network.</li>
+  <li>Explain how network devices work together.</li>
+  <li>Describe how data travels through a network.</li>
+  <li>Identify common internet connection problems and suggest solutions.</li>
+  <li>Understand basic applications of Artificial Intelligence in networks.</li>
+ </ol></div>
+ <p class="legend">Your progress is saved on this device automatically.</p>
+ <p class="legend">Created by <b>مريم ابراهيم حسانين</b> (Maryam Ibrahim Hassanein), ICT Teacher.</p>
+</section>
+
+<!-- S1 -->
+<section id="s1">
+ <h1>1. What Is a Computer Network?</h1>
+ <p>Imagine you want to share a picture or a game with your friend. Instead of sending it by traditional mail, you can share it almost instantly using a computer network.</p>
+ <div class="def"><b>A computer network</b> is a group of computers and other devices connected together to communicate and share information.</div>
+ <h2>Two main types of networks</h2>
+ <div class="grid">
+  <div class="card"><h3>Wired network</h3><div id="mWired"></div><p>Devices connect using physical <b>cables</b>. Wired connections are usually steady and fast.</p></div>
+  <div class="card"><h3>Wireless network</h3><div id="mWifi"></div><p>Devices connect <b>without cables</b> using Wi-Fi. They are easy to move around.</p></div>
+ </div>
+ <div class="card"><b>Quick check</b><div id="q1"></div></div>
+ <div class="nx"><span></span><button class="btn" onclick="go('s2')">Next: Network Components</button></div>
+</section>
+
+<!-- S2 -->
+<section id="s2">
+ <h1>2. Network Components</h1>
+ <p>A network is built from several parts. Each part has its own job. Read about each one, then answer the question.</p>
+ <div id="comps"></div>
+ <div class="nx"><button class="btn g" onclick="go('s1')">Back</button><button class="btn" onclick="go('s3')">Next: How the Internet Works</button></div>
+</section>
+
+<!-- S3 -->
+<section id="s3">
+ <h1>3. How Does the Internet Work?</h1>
+ <p>What happens when you watch an online video? Your device sends a <span class="chip q">request</span> and the internet sends back a <span class="chip r">response</span> with the video data.</p>
+ <div class="pal noprint">
+  <button class="btn g on" id="mS">Step-by-Step Mode</button><button class="btn g" id="mP">Play Animation Mode</button>
+ </div>
+ <div class="cvw"><svg id="an" viewBox="0 0 800 210" role="img" aria-label="Animated diagram of a video request travelling to the ISP and back"></svg></div>
+ <div class="card"><span class="chip q" id="kb">Ready</span> <span id="kt">Press Next to follow the data on its journey.</span></div>
+ <div class="pal"><span id="stepc"><button class="btn" id="bn">Next step</button></span><span id="playc" style="display:none"><button class="btn" id="bp">Play</button></span><button class="btn g" id="br">Restart</button></div>
+ <ol class="st" id="sl"></ol>
+ <p class="legend">Cyan packets are requests. Violet packets are responses. They travel in opposite directions.</p>
+ <div class="nx"><button class="btn g" onclick="go('s2')">Back</button><button class="btn" onclick="go('s4')">Next: AI in Networks</button></div>
+</section>
+
+<!-- S4 -->
+<section id="s4">
+ <h1>4. Artificial Intelligence in Networks</h1>
+ <div class="def"><b>Artificial Intelligence (AI)</b> is a technology that enables computers and applications to perform tasks that normally require human intelligence.</div>
+ <div class="grid">
+  <div class="card"><h3>Learning and making predictions</h3><p>AI studies lots of examples and learns patterns. Then it can guess what may happen next, like tomorrow's weather.</p></div>
+  <div class="card"><h3>Writing an article</h3><p>AI can write a short article about a topic. People should always check the facts.</p></div>
+  <div class="card"><h3>Imitating voices</h3><p>AI can copy the sound of a voice. This is how some voice assistants can talk.</p></div>
+  <div class="card"><h3>Producing videos</h3><p>AI can help create video clips from a description or from pictures.</p></div>
+  <div class="card"><h3>Predicting network failures</h3><p>AI watches network data. If it spots a warning sign, such as a device that keeps slowing down, it can warn engineers before the network stops working.</p></div>
+ </div>
+ <div class="card"><b>Quick check</b><div id="qai"></div></div>
+ <div class="nx"><button class="btn g" onclick="go('s3')">Back</button><button class="btn" onclick="go('lab')">Next: Network Lab</button></div>
+</section>
+
+<!-- LAB -->
+<section id="lab">
+ <h1>Final Lab: Build Your Own Network</h1>
+ <div class="pal noprint" id="tabs">
+  <button class="btn g" data-m="A">Activity A: Build a Network</button>
+  <button class="btn g" data-m="B">Activity B: Find the Problem</button>
+  <button class="btn g" data-m="C">Activity C: Network Challenge</button>
+ </div>
+ <div class="card" id="task"></div>
+ <div class="pal" id="pal"></div>
+ <div class="pal" id="tools"></div>
+ <div class="pal" id="acts"></div>
+ <div class="cvw"><svg id="cv" viewBox="0 0 800 440"></svg></div>
+ <p class="legend" id="stat"></p>
+ <div class="card" id="fb" aria-live="polite">Welcome, engineer! Your feedback will appear here.</div>
+ <p class="legend">Tip: on a phone, turn it sideways for a bigger workspace. Tap a device to add it. Drag to move it.</p>
+ <div class="nx"><button class="btn g" onclick="go('s4')">Back</button><button class="btn" onclick="go('end')">See my results</button></div>
+</section>
+
+<!-- END -->
+<section id="end">
+ <h1>My Results</h1>
+ <div class="grid">
+  <div class="card"><h3>Total XP</h3><div style="font-size:2.4rem;font-weight:800" id="rxp">0</div></div>
+  <div class="card"><h3>Lesson progress</h3><div style="font-size:2.4rem;font-weight:800" id="rpc">0%</div><div id="rlist" class="legend"></div></div>
+ </div>
+ <h2>Achievement badges</h2><div id="badges"></div>
+ <div id="certw"></div>
+ <p class="noprint"><button class="btn g" id="rs">Reset all progress</button></p>
+</section>
+
+<footer class="legend" style="margin-top:40px;padding-top:14px;border-top:1px solid var(--line)">© 2026 مريم ابراهيم حسانين (Maryam Ibrahim Hassanein). All rights reserved.</footer>
+</main></div>
+
+<script>
+/* ===== Network Explorer – vanilla JS, no dependencies ===== */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+
+/* ---------- Saved progress (localStorage) ---------- */
+let S={xp:0,done:{},q:{},sc:{},name:''};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem('ne-v1')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('ne-v1',JSON.stringify(S))}catch(e){}};
+const award=(k,x)=>{if(!S.q[k]){S.q[k]=1;S.xp+=x;save();upd()}};
+const KEYS=['s1','s2','s3','s4','A','B','C'];
+function chk(){
+ if(S.q.q1)S.done.s1=1; if(['c0','c1','c2','c3','c4'].every(k=>S.q[k]))S.done.s2=1; if(S.q.qai)S.done.s4=1;
+ save();upd();
+}
+function upd(){
+ const n=KEYS.filter(k=>S.done[k]).length,p=Math.round(n/KEYS.length*100);
+ $('#xp').textContent=S.xp;$('#pct').textContent=p+'%';$('#pbar').style.width=p+'%';
+ $$('#nav .nv').forEach(b=>b.classList.toggle('ck',!!S.done[b.dataset.k]));
+}
+
+/* ---------- Navigation ---------- */
+const SECS=[['home','Welcome'],['s1','1 What is a network?'],['s2','2 Components'],['s3','3 How the internet works'],['s4','4 AI in networks'],['lab','Network Lab'],['end','My results']];
+const navEl=$('#nav'),pg=$('.pg');
+SECS.forEach(([id,t])=>{const b=document.createElement('button');b.className='nv';b.textContent=t;b.dataset.id=id;
+ b.dataset.k={s1:'s1',s2:'s2',s3:'s3',s4:'s4',lab:'',end:''}[id]||'';b.onclick=()=>go(id);navEl.insertBefore(b,pg)});
+function go(id){
+ $$('section').forEach(s=>s.classList.toggle('on',s.id===id));
+ $$('#nav .nv').forEach(b=>b.classList.toggle('on',b.dataset.id===id));
+ if(id==='end')results();
+ window.scrollTo(0,0);
+}
+
+/* ---------- Icons (inline SVG) ---------- */
+const IC={
+ isp:'<path d="M-24 12a12 12 0 0 1 4-23 16 16 0 0 1 30-3 13 13 0 0 1 10 26z"/>',
+ modem:'<rect x="-26" y="-6" width="52" height="22" rx="4"/><path d="M-14-6l-4-16M14-6l4-16"/><circle cx="-12" cy="5" r="2.5" class="f"/><circle cx="-2" cy="5" r="2.5" class="f"/>',
+ router:'<rect x="-26" y="-2" width="52" height="20" rx="4"/><path d="M-16-2v-20M16-2v-20"/><circle cx="-12" cy="8" r="2.5" class="f"/><path d="M0 8h16"/>',
+ switch:'<rect x="-28" y="-10" width="56" height="22" rx="3"/>'+[-20,-10,0,10,20].map(x=>`<rect x="${x-3}" y="-3" width="6" height="9" class="f"/>`).join(''),
+ pc:'<rect x="-22" y="-22" width="44" height="30" rx="3"/><path d="M0 8v10M-12 18h24"/>',
+ laptop:'<rect x="-18" y="-20" width="36" height="24" rx="2"/><path d="M-26 12h52l-6-8h-40z"/>',
+ phone:'<rect x="-12" y="-24" width="24" height="46" rx="5"/><path d="M-4 15h8"/>',
+ cable:'<path d="M-26 16c16 0 4-26 24-26"/><rect x="-2" y="-18" width="26" height="16" rx="2"/><path d="M4-18v-5M11-18v-5M18-18v-5"/>',
+ lan:'<rect x="-8" y="-24" width="16" height="12" rx="2"/><path d="M0-12v8M-18 4v-8h36v8"/><rect x="-26" y="4" width="16" height="12" rx="2"/><rect x="10" y="4" width="16" height="12" rx="2"/>'
+};
+const LBL={isp:'Internet (ISP)',modem:'Modem',router:'Router',switch:'Switch',pc:'Computer',laptop:'Laptop',phone:'Smartphone'};
+const big=t=>`<svg viewBox="-34 -34 68 68"><g class="ic">${IC[t]}</g></svg>`;
+function mini(ns,ls){return `<svg viewBox="0 0 300 150">${ls.map(([i,j,d])=>`<line x1="${ns[i][1]}" y1="${ns[i][2]}" x2="${ns[j][1]}" y2="${ns[j][2]}" stroke="#22d3ee" stroke-width="3" ${d?'stroke-dasharray="3 8"':''}/>`).join('')}${ns.map(([t,x,y])=>`<g class="ic" transform="translate(${x} ${y})">${IC[t]}</g>`).join('')}</svg>`}
+$('#mWired').innerHTML=mini([['pc',50,75],['switch',150,75],['laptop',250,75]],[[0,1],[1,2]]);
+$('#mWifi').innerHTML=mini([['router',150,115],['phone',55,45],['laptop',245,45]],[[0,1,1],[0,2,1]]);
+$('#heroSvg').innerHTML=mini([['isp',40,40],['modem',110,100],['router',190,60],['laptop',260,110],['phone',250,30]],[[0,1],[1,2],[2,3,1],[2,4,1]]);
+
+/* ---------- Quiz helper (instant feedback, retry allowed) ---------- */
+function quiz(id,q,opts,ans,why,xp=10){
+ return `<div class="qz" data-id="${id}" data-a="${ans}" data-w="${why.replace(/"/g,'&quot;')}"><b>${q}</b>${opts.map((o,i)=>`<button data-i="${i}">${o}</button>`).join('')}<div class="ans"></div></div>`;
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('.qz button');if(!b)return;
+ const z=b.closest('.qz'),out=z.querySelector('.ans'),good=+b.dataset.i===+z.dataset.a;
+ z.querySelectorAll('button').forEach(x=>x.classList.remove('no'));
+ if(good){z.querySelectorAll('button').forEach(x=>x.disabled=true);b.classList.add('ok');
+  out.innerHTML=`<span class="ok-t"><b>Correct!</b></span> ${z.dataset.w} <small>+10 XP</small>`;award(z.dataset.id,10);chk()}
+ else{b.classList.add('no');out.innerHTML='<span class="bad-t"><b>Not quite.</b></span> Read the section again and try another answer.'}
+});
+$('#q1').innerHTML=quiz('q1','Which one is a wireless connection?',['A network cable','Wi-Fi','A port'],1,'Wi-Fi connects devices without cables.');
+$('#qai').innerHTML=quiz('qai','Which is an example of AI helping a network?',['Predicting a possible network failure','Plugging in a cable','Turning off the router by hand'],0,'AI can notice warning signs and predict a failure before it happens.');
+
+/* ---------- Section 2: components ---------- */
+const COMP=[
+ ['modem','Modem','Connects your home network to your Internet Service Provider (ISP). It converts signals so your network can talk to the internet.','Example: the box where the internet line from your home enters.',['What does a modem do?','Connects your network to the ISP','Sends data to the right computer in a lab','Carries data as a cable'],0,'The modem links your network to the ISP.'],
+ ['router','Router','Shares the internet connection with the devices in your home, using cables or Wi-Fi.','Example: the device that lets your tablet and phone use Wi-Fi.',['Which device shares the internet with a phone, tablet and laptop at home?','Router','A cable','A port'],0,'The router shares the connection.'],
+ ['switch','Switch','Connects many devices inside a network and sends data to the correct device.','Example: a school lab where 10 computers plug into one switch.',['Which device passes data to the correct computer in a lab?','Modem','Switch','ISP'],1,'A switch forwards data to the right device.'],
+ ['cable','Cables and Ports','Cables carry data between connected devices. Ports are the openings where the cables are plugged in.','Example: the network cable between a computer and a router.',['Where do you plug in a network cable?','Into a port','Into the screen','Into the mouse'],0,'Ports are the openings for cables.'],
+ ['lan','Local Area Network (LAN)','A network that connects devices in a small area.','Example: the computers in your school computer laboratory.',['Which one is a LAN?','All computers in the world','Computers in one school lab','One single phone'],1,'A LAN covers a limited area, like one lab.']
+];
+$('#comps').innerHTML=COMP.map((c,i)=>`<div class="card"><div class="comp">${big(c[0])}<div><h3>${c[1]}</h3><span class="tag">What it does</span><p>${c[2]}</p><span class="tag">Real-world example</span><p>${c[3]}</p>${quiz('c'+i,c[4][0],c[4].slice(1),c[5],c[6])}</div></div></div>`).join('');
+
+/* ---------- Section 3: animated data journey ---------- */
+const NP=[['pc',90,'Your device'],['router',290,'Router'],['modem',490,'Modem'],['isp',700,'ISP and video server']];
+const ST=[
+ ['Your device asks for a video. This message is called a request.',0,0,'q'],
+ ['The request travels to the router.',0,1,'q'],
+ ['The router passes the request to the modem.',1,2,'q'],
+ ['The modem talks to the ISP, which finds the video on the internet.',2,3,'q'],
+ ['Response: the ISP sends the video data back to the modem.',3,2,'r'],
+ ['The modem sends the video data to the router.',2,1,'r'],
+ ['The router delivers the video to your device. Enjoy watching!',1,0,'r']];
+(function(){
+ let h='<defs><marker id="aq" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#22d3ee"/></marker><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#a78bfa"/></marker></defs>';
+ for(let i=0;i<3;i++){const a=NP[i][1]+44,b=NP[i+1][1]-44;
+  h+=`<line x1="${a}" y1="100" x2="${b-4}" y2="100" stroke="#22d3ee" stroke-width="3" marker-end="url(#aq)"/><line x1="${b}" y1="140" x2="${a+4}" y2="140" stroke="#a78bfa" stroke-width="3" marker-end="url(#ar)"/>`}
+ h+='<circle id="pk" r="9" cx="0" cy="0" fill="#22d3ee" style="display:none" stroke="#fff" stroke-width="2"/>';
+ NP.forEach(([t,x,l],i)=>h+=`<g id="nd${i}"><circle cx="${x}" cy="120" r="38" fill="#0e1a3d" stroke="#25397a" stroke-width="3"/><g class="ic" transform="translate(${x} 120)">${IC[t]}</g><text x="${x}" y="182" fill="#e8eeff" font-size="17" text-anchor="middle" font-weight="600">${l}</text></g>`);
+ $('#an').innerHTML=h;
+ $('#sl').innerHTML=ST.map((s,i)=>`<li id="li${i}">${i+1}. ${s[0]}</li>`).join('');
+})();
+let cur=-1,busy=0,run=0,mode='S';
+function mv(i,cb){
+ const[t,a,b,k]=ST[i],y=k==='q'?100:140,d=b>a?1:-1,pk=$('#pk');
+ const x0=a===b?NP[a][1]+62:NP[a][1]+d*44,x1=a===b?x0:NP[b][1]-d*44;
+ $('#kt').textContent=t;const kb=$('#kb');kb.textContent=k==='q'?'Request journey':'Response journey';kb.className='chip '+k;
+ $$('#sl li').forEach((l,j)=>l.classList.toggle('on',j===i));
+ pk.style.display='';pk.setAttribute('fill',k==='q'?'#22d3ee':'#a78bfa');pk.setAttribute('cy',y);
+ const t0=performance.now(),D=a===b?800:1200;busy=1;
+ (function f(n){const p=Math.min(1,(n-t0)/D);pk.setAttribute('cx',x0+(x1-x0)*p);pk.setAttribute('r',9+(a===b?4*Math.abs(Math.sin(p*Math.PI*3)):0));
+  if(p<1)requestAnimationFrame(f);else{busy=0;cur=i;if(i===6){S.done.s3=1;award('s3',20);chk()}cb&&cb()}})(t0);
+}
+function reset(){run++;busy=0;cur=-1;$('#pk').style.display='none';$$('#sl li').forEach(l=>l.classList.remove('on'));$('#kb').textContent='Ready';$('#kb').className='chip q';$('#kt').textContent=mode==='S'?'Press Next to follow the data on its journey.':'Press Play to watch the whole journey.';$('#bn').disabled=false;$('#bp').disabled=false}
+$('#bn').onclick=()=>{if(busy)return;if(cur>=6)reset();mv(cur+1,()=>{if(cur===6)$('#bn').textContent='Watch again';else $('#bn').textContent='Next step'})};
+$('#bp').onclick=()=>{if(busy)return;reset();$('#bp').disabled=true;const my=run;(function nx(i){if(my!==run)return;if(i>6){$('#bp').disabled=false;return}mv(i,()=>setTimeout(()=>nx(i+1),350))})(0)};
+$('#br').onclick=()=>{reset();$('#bn').textContent='Next step'};
+[['#mS','S'],['#mP','P']].forEach(([s,m])=>$(s).onclick=()=>{mode=m;$('#mS').classList.toggle('on',m==='S');$('#mP').classList.toggle('on',m==='P');$('#stepc').style.display=m==='S'?'':'none';$('#playc').style.display=m==='P'?'':'none';reset();$('#bn').textContent='Next step'});
+
+/* ---------- Lab: shared simulation engine ---------- */
+const cv=$('#cv'),END=['pc','laptop','phone'];
+let L={m:'A',nodes:[],links:[],tool:'move',sel:null,pick:null,mist:0,hint:0,drag:null,id:1,si:0,solved:{}};
+const nd=id=>L.nodes.find(n=>n.id===id);
+const lk=(a,b)=>L.links.find(l=>(l.a===a&&l.b===b)||(l.a===b&&l.b===a));
+const key=l=>[l.a,l.b].sort().join('|');
+const say=(m,ok)=>{const f=$('#fb');f.innerHTML=m;f.className='card '+(ok?'ok':ok===0?'bad':'');return false};
+
+/* Connection rules: returns [valid, isWifi, explanation] */
+function rule(a,b){
+ const k=[a,b].sort().join('+');
+ const R={'isp+modem':[1,0,'The modem connects your network to the Internet Service Provider (ISP). Correct!'],
+ 'modem+router':[1,0,'The modem passes the internet to the router. Correct!'],
+ 'router+switch':[1,0,'The router shares the internet with the switch, so more devices can join. Correct!'],
+ 'pc+router':[1,0,'A cable from the router to the computer works. Correct!'],
+ 'laptop+router':[1,0,'A cable from the router to the laptop works. Correct!'],
+ 'phone+router':[1,1,'The smartphone joins the router using Wi-Fi (dotted line). Correct!'],
+ 'pc+switch':[1,0,'The computer is plugged into the switch. Correct!'],
+ 'laptop+switch':[1,0,'The laptop is plugged into the switch. Correct!']};
+ if(R[k])return R[k];
+ if(k==='phone+switch')return[0,0,'A switch only has cable ports. A smartphone joins by Wi-Fi, so connect it to the router.'];
+ if(a==='isp'||b==='isp')return[0,0,'Only the modem talks to the ISP. Connect the ISP to the modem.'];
+ if(a==='modem'||b==='modem')return[0,0,'A modem cannot serve devices directly. Connect it to the router first.'];
+ return[0,0,'These two cannot be connected this way. Devices join the network through the router or a switch.'];
+}
+const lanCount=x=>L.links.filter(l=>!l.w&&(l.a===x||l.b===x)&&nd(l.a===x?l.b:l.a).t!=='modem').length;
+function connect(a,b){
+ if(a===b)return;
+ if(lk(a,b))return say('These two are already connected.',0);
+ const A=nd(a),B=nd(b),[ok,w,m]=rule(A.t,B.t);
+ if(!ok){L.mist++;return say(m,0)}
+ if([A,B].some(n=>n.t==='router')&&!w&&![A,B].some(n=>n.t==='modem')){const r=A.t==='router'?A:B;if(lanCount(r.id)>=2){L.mist++;return say('The router has only 2 cable (LAN) ports and both are used. Add a switch to connect more devices.',0)}}
+ if(A.t==='modem'&&B.t==='router'||A.t==='router'&&B.t==='modem'){const md=A.t==='modem'?A:B;if(L.links.some(l=>(l.a===md.id||l.b===md.id)&&[nd(l.a).t,nd(l.b).t].includes('router')))return say('This modem is already connected to a router.',0)}
+ L.links.push({a,b,w});render();say(m,1);
+}
+function online(){const s=new Set(['isp']),q=['isp'];
+ while(q.length){const x=q.pop();L.links.forEach(l=>{if(l.x)return;const o=l.a===x?l.b:l.b===x?l.a:null;if(!o||s.has(o)||nd(o).off)return;s.add(o);q.push(o)})}return s}
+
+/* Drawing */
+function render(){
+ const on=online();let h='';
+ L.links.forEach((l,i)=>{const A=nd(l.a),B=nd(l.b),sel=L.pick==='L:'+key(l);
+  const c=sel?'#fbbf24':l.x?'#fb7185':on.has(l.a)&&on.has(l.b)?'#22d3ee':'#4b5f9e',mx=(A.x+B.x)/2,my=(A.y+B.y)/2;
+  h+=`<g data-l="${i}" style="cursor:pointer"><line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="${c}" stroke-width="${sel?6:4}" ${l.w?'stroke-dasharray="3 10"':l.x?'stroke-dasharray="12 9"':''}/><line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="transparent" stroke-width="34"/>${l.x?`<text x="${mx}" y="${my+7}" style="fill:#fb7185;font-size:26px">✕</text>`:''}</g>`});
+ L.nodes.forEach(n=>{
+  const end=END.includes(n.t),sel=L.sel===n.id||L.pick==='N:'+n.id;
+  const c=sel?'#fbbf24':n.off?'#fb7185':end?(on.has(n.id)?'#34d399':L.m==='B'?'#fb7185':'#4b5f9e'):on.has(n.id)?'#22d3ee':'#4b5f9e';
+  h+=`<g data-n="${n.id}" transform="translate(${n.x} ${n.y})"><circle r="46" fill="#0e1a3d" stroke="${c}" stroke-width="4"/><g class="ic" transform="scale(1.15)">${IC[n.t]}</g><text y="68">${n.label||LBL[n.t]}${n.off?' (OFF)':''}</text></g>`});
+ cv.innerHTML=h;
+ const ends=L.nodes.filter(n=>END.includes(n.t));
+ $('#stat').textContent=`Devices online: ${ends.filter(n=>on.has(n.id)).length} of ${ends.length}. Green circle = online.`;
+}
+const pt=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*800/r.width,y:(e.clientY-r.top)*440/r.height}};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* Pointer interaction: move, cable, delete (A/C) – select (B) */
+cv.addEventListener('pointerdown',e=>{
+ const g=e.target.closest('[data-n],[data-l]');if(!g)return;
+ if(g.dataset.l!==undefined){const l=L.links[+g.dataset.l];
+  if(L.m==='B'){L.pick='L:'+key(l);selInfo();render()}else if(L.tool==='del'){L.links.splice(+g.dataset.l,1);render();say('Cable removed.')}return}
+ const n=nd(g.dataset.n);
+ if(L.m==='B'){L.pick='N:'+n.id;selInfo();render();return}
+ if(L.tool==='cable'){if(!L.sel){L.sel=n.id;say(`<b>${LBL[n.t]}</b> selected. Now tap the device you want to connect it to.`)}else{const a=L.sel;L.sel=null;connect(a,n.id)}render();return}
+ if(L.tool==='del'){if(n.t==='isp')return say('The ISP cannot be removed.',0);L.nodes=L.nodes.filter(x=>x!==n);L.links=L.links.filter(l=>l.a!==n.id&&l.b!==n.id);render();return}
+ const p=pt(e);L.drag={n,dx:p.x-n.x,dy:p.y-n.y};cv.setPointerCapture(e.pointerId);
+});
+cv.addEventListener('pointermove',e=>{if(!L.drag)return;const p=pt(e);L.drag.n.x=clamp(p.x-L.drag.dx,50,750);L.drag.n.y=clamp(p.y-L.drag.dy,50,350);render()});
+['pointerup','pointercancel'].forEach(t=>cv.addEventListener(t,()=>L.drag=null));
+cv.addEventListener('dragover',e=>e.preventDefault());
+cv.addEventListener('drop',e=>{e.preventDefault();const t=e.dataTransfer.getData('text/plain');if(LBL[t]){const p=pt(e);add(t,clamp(p.x,50,750),clamp(p.y,50,350))}});
+
+/* Adding devices */
+const SLOTS=[[230,90],[400,90],[570,90],[230,350],[400,350],[570,350],[700,90],[700,350],[400,220],[570,220],[700,220],[230,220]];
+function add(t,x,y){
+ if((t==='modem'||t==='router'||t==='switch')&&L.nodes.some(n=>n.t===t))return say(`You already have a ${LBL[t].toLowerCase()}. One is enough for this network.`,0);
+ if(L.nodes.length>=14)return say('The workspace is full.',0);
+ if(x===undefined){const s=SLOTS.find(([a,b])=>L.nodes.every(n=>Math.hypot(n.x-a,n.y-b)>90))||[400,220];[x,y]=s}
+ L.nodes.push({id:t+(L.id++),t,x,y});render();say(`${LBL[t]} added. Now use the <b>Cable</b> tool to connect it.`);
+}
+
+/* Lab set-up for each activity */
+const TASK={
+ A:'<b>Activity A.</b> Build a working network. Place a modem and a router, then add a computer, a laptop and a smartphone. Connect everything so all three devices reach the internet (ISP). Then press <b>Check network</b>.',
+ B:'<b>Activity B.</b> You are the network engineer. Read the problem, click the part you think is broken, then choose the action that fixes it.',
+ C:'<b>Activity C: Network Challenge.</b> Your school computer laboratory needs a network connecting 4 computers to the internet. Build the correct network using the available devices. Choose carefully: some devices are not needed!'
+};
+const SC=[
+ {t:'A computer cannot connect to the internet.',fix:['L:pc1|switch','N:pc1'],act:'plug',hint:'Only Computer 1 is offline. Look at its cable. Does it look connected?',why:'The network cable was unplugged, so no data could reach the computer. Plugging it back in fixes it.',set(){lk('switch','pc1').x=1},fixit(){lk('switch','pc1').x=0}},
+ {t:'All devices have lost their internet connection.',fix:['N:router'],act:'power',hint:'Everyone lost internet at the same time. Which device shares the internet with all the others?',why:'The router was turned off. It shares the internet with every device, so all of them went offline. Turning it on fixes it.',set(){nd('router').off=1},fixit(){nd('router').off=0}},
+ {t:'A computer is connected to the wrong network port.',fix:['L:modem|pc1','N:pc1'],act:'move',hint:'Computers should not plug into the modem. Find the cable that goes to the wrong place.',why:'Computer 1 was plugged into the modem. Devices must connect to the router or switch. Moving the cable to the switch fixes it.',set(){L.links=L.links.filter(l=>key(l)!=='pc1|switch');L.links.push({a:'modem',b:'pc1'})},fixit(){L.links=L.links.filter(l=>key(l)!=='modem|pc1');L.links.push({a:'switch',b:'pc1'})}},
+ {t:'The modem is not connected to the Internet Service Provider.',fix:['L:isp|modem','N:modem'],act:'isp',hint:'The router and modem seem fine, but the internet never arrives. Check the line between the ISP and the modem.',why:'The line from the ISP to the modem was broken, so no internet could enter the network. Repairing it fixes every device.',set(){lk('isp','modem').x=1},fixit(){lk('isp','modem').x=0}}
+];
+const ACTS={plug:'Plug the cable back in',power:'Turn the power on',move:'Move cable to the correct device',isp:'Repair the line to the ISP',restart:'Restart the computer'};
+
+function initLab(m){
+ L={m,nodes:[],links:[],tool:'move',sel:null,pick:null,mist:0,hint:0,drag:null,id:1,si:L.si||0,solved:L.solved||{}};
+ $$('#tabs .btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+ $('#task').innerHTML=TASK[m];
+ $('#pal').style.display=$('#tools').style.display=m==='B'?'none':'';$('#acts').style.display=m==='B'?'':'none';
+ if(m==='B'){bScene(L.si)}
+ else{L.nodes=[{id:'isp',t:'isp',x:70,y:220}];
+  const set=m==='A'?['modem','router','switch','pc','laptop','phone']:['modem','router','switch','pc','laptop','phone'];
+  $('#pal').innerHTML=set.map(t=>`<button class="btn g" draggable="true" data-t="${t}">+ ${LBL[t]}</button>`).join('');
+  $('#tools').innerHTML=[['move','Move'],['cable','Cable'],['del','Delete']].map(([k,t])=>`<button class="btn g tl ${k==='move'?'on':''}" data-tool="${k}">${t}</button>`).join('')+'<button class="btn" id="ck">Check network</button><button class="btn g" id="hn">Hint</button><button class="btn g" id="rl">Restart activity</button>';
+  say(m==='A'?'Start from the internet: place a modem, then connect the ISP to it.':'Plan your devices first, then connect them.')}
+ render();
+}
+function bScene(i){
+ L.si=i;L.pick=null;L.nodes=[{id:'isp',t:'isp',x:70,y:220},{id:'modem',t:'modem',x:230,y:220},{id:'router',t:'router',x:390,y:220},{id:'switch',t:'switch',x:550,y:220},{id:'pc1',t:'pc',x:700,y:90,label:'Computer 1'},{id:'pc2',t:'pc',x:700,y:220,label:'Computer 2'},{id:'lap',t:'laptop',x:700,y:350,label:'Laptop'}];
+ L.links=[['isp','modem'],['modem','router'],['router','switch'],['switch','pc1'],['switch','pc2'],['switch','lap']].map(([a,b])=>({a,b}));
+ SC[i].set();
+ $('#task').innerHTML=`<b>Problem ${i+1} of 4.</b> ${SC[i].t}`;
+ $('#acts').innerHTML=`<span id="sel" class="legend" style="width:100%">Click a device or cable in the diagram.</span>`+Object.entries(ACTS).map(([k,t])=>`<button class="btn g" data-act="${k}">${t}</button>`).join('')+`<button class="btn g" id="hn">Hint</button><button class="btn g" id="rl">Restart activity</button><button class="btn" id="nx" style="display:none">Next problem</button>`;
+ say('Look carefully at the diagram. Red means a device is offline.');
+ render();
+}
+const selInfo=()=>{const e=$('#sel');if(!e)return;const p=L.pick;e.textContent='Selected: '+(p[0]==='N'?LBL[nd(p.slice(2)).t]:'a cable')+'. Now choose an action.'};
+
+/* Lab buttons (event delegation) */
+$('#tabs').onclick=e=>{const b=e.target.closest('[data-m]');if(b)initLab(b.dataset.m)};
+$('#lab').addEventListener('click',e=>{
+ const t=e.target.closest('button');if(!t)return;
+ if(t.dataset.t&&L.m!=='B')add(t.dataset.t);
+ if(t.dataset.tool){L.tool=t.dataset.tool;L.sel=null;$$('.tl').forEach(x=>x.classList.toggle('on',x===t));say({move:'Drag devices to move them.',cable:'Tap one device, then another, to connect them with a cable.',del:'Tap a device or cable to remove it.'}[L.tool]);render()}
+ if(t.id==='rl'){if(L.m==='B'){L.solved={};L.si=0}initLab(L.m)}
+ if(t.id==='hn')hint();
+ if(t.id==='ck')check();
+ if(t.dataset.act)tryFix(t.dataset.act);
+ if(t.id==='nx'){bScene(L.si+1)}
+});
+$('#lab').addEventListener('dragstart',e=>{const t=e.target.closest('[data-t]');if(t)e.dataTransfer.setData('text/plain',t.dataset.t)});
+
+function hint(){
+ L.hint++;
+ if(L.m==='B')return say('<b>Hint:</b> '+SC[L.si].hint);
+ const has=t=>L.nodes.some(n=>n.t===t),linked=(x)=>L.links.some(l=>nd(l.a).t===x||nd(l.b).t===x);
+ let h='Think about the path the internet takes: ISP, then modem, then router, then your devices.';
+ if(!has('modem'))h='You need a modem first. It connects your network to the ISP.';
+ else if(!L.links.some(l=>key(l)==='isp|modem'||key(l)==='modem|isp'))h='Use the Cable tool to connect the ISP to the modem.';
+ else if(!has('router'))h='Add a router. It shares the internet with your devices.';
+ else if(![...L.links].some(l=>[nd(l.a).t,nd(l.b).t].sort().join()==='modem,router'))h='Connect the modem to the router. Never connect devices straight to the modem.';
+ else if(L.m==='C'&&!has('switch'))h='The router has only 2 cable ports. A switch lets many computers join. Add one and connect it to the router.';
+ else h='Connect each computer to the router or the switch. A smartphone uses Wi-Fi, so connect it to the router.';
+ say('<b>Hint:</b> '+h);
+}
+function check(){
+ const on=online(),has=t=>L.nodes.some(n=>n.t===t),ends=L.nodes.filter(n=>END.includes(n.t)),pcs=L.nodes.filter(n=>n.t==='pc').length;
+ const miss=[];['modem','router'].forEach(t=>has(t)||miss.push(LBL[t]));
+ if(L.m==='A'){['pc','laptop','phone'].forEach(t=>has(t)||miss.push(LBL[t]))}
+ else{has('switch')||miss.push('Switch');if(pcs<4)miss.push(`Computers (you have ${pcs} of 4)`)}
+ if(miss.length)return say('Still needed: '+miss.join(', ')+'.',0);
+ if(L.m==='C'&&(pcs>4||has('laptop')||has('phone')))return say('This lab needs exactly 4 computers and no other end devices. Remove the extra ones.',0);
+ const off=ends.find(n=>!on.has(n.id));
+ if(off){L.mist++;let w;
+  if(!L.links.some(l=>l.a==='isp'||l.b==='isp'))w='The ISP is not connected to a modem yet.';
+  else if(!L.links.some(l=>[nd(l.a).t,nd(l.b).t].sort().join()==='modem,router'))w='The modem is not connected to a router yet.';
+  else if(!L.links.some(l=>l.a===off.id||l.b===off.id))w=`The ${LBL[off.t]} is not connected to anything.`;
+  else w=`The ${LBL[off.t]} is connected, but its path to the router is incomplete. Does it reach the router, or a switch that is connected to the router?`;
+  return say('Not online yet. '+w,0)}
+ const pts=L.m==='A'?Math.max(20,40-5*L.mist):Math.max(40,100-8*L.mist-5*L.hint);
+ S.done[L.m]=1;S.sc[L.m]=Math.max(S.sc[L.m]||0,pts);award('lab'+L.m,pts);chk();
+ say(`<b style="font-size:1.2rem">Network Successfully Connected!</b><br>All devices are online. You scored <b>${pts} points</b> (mistakes: ${L.mist}, hints used: ${L.hint}).`,1);
+}
+function tryFix(a){
+ if(!L.pick)return say('First click the part you think is the problem.',0);
+ const sc=SC[L.si];
+ if(!sc.fix.includes(L.pick)){L.mist++;return say('That part is working fine. Look for the device or cable that stopped working. Try a hint if you are stuck.',0)}
+ if(a!==sc.act){L.mist++;return say('You found the faulty part, but that action will not fix it. Think about what is wrong with it.',0)}
+ sc.fixit();L.pick=null;L.solved[L.si]=1;render();
+ award('B'+L.si,15);
+ say('<b>Correct!</b> '+sc.why,1);
+ if(Object.keys(L.solved).length===4){S.done.B=1;award('Bdone',20);chk();$('#fb').innerHTML+='<br><b>All 4 problems solved. Great troubleshooting!</b>'}
+ else{chk();if(L.si<3)$('#nx').style.display=''}
+}
+
+/* ---------- Results, badges, certificate ---------- */
+function results(){
+ const n=KEYS.filter(k=>S.done[k]).length,p=Math.round(n/KEYS.length*100);
+ $('#rxp').textContent=S.xp;$('#rpc').textContent=p+'%';
+ $('#rlist').innerHTML=KEYS.map((k,i)=>`${S.done[k]?'✓':'○'} ${['Section 1','Section 2','Section 3','Section 4','Lab A','Lab B','Lab C'][i]}`).join('<br>')+`<br>Lab scores: A ${S.sc.A||0}, C ${S.sc.C||0}`;
+ const D=S.done,B=[['Network Starter','Finish Sections 1 and 2',D.s1&&D.s2],['Packet Tracker','Follow the data journey',D.s3],['AI Thinker','Complete Section 4',D.s4],['Troubleshooter','Fix all 4 problems',D.B],['Network Engineer','Finish Labs A and C',D.A&&D.C]];
+ $('#badges').innerHTML=B.map(([t,d,o])=>`<span class="badge ${o?'on':''}" title="${d}"><b>${t}</b><br><small>${d}</small></span>`).join('');
+ $('#certw').innerHTML=p===100?`<div class="cert"><h2>Certificate of Completion</h2><p style="margin:auto">This certifies that</p><h1 id="cn">${S.name||'Network Explorer'}</h1><p style="margin:auto">has completed the lesson <b>Computer Networks</b> with <b>${S.xp} XP</b>.</p><p class="noprint" style="margin:14px auto"><input type="text" id="nm" placeholder="Type your name" value="${S.name||''}"> <button class="btn" id="pn">Print certificate</button></p></div>`:`<div class="card">Finish all sections and labs to unlock your certificate. You are ${p}% of the way there.</div>`;
+ const pn=$('#pn');if(pn)pn.onclick=()=>{S.name=$('#nm').value.trim();save();$('#cn').textContent=S.name||'Network Explorer';window.print()};
+}
+$('#rs').onclick=()=>{if(confirm('Delete all your progress and start again?')){S={xp:0,done:{},q:{},sc:{},name:''};save();location.reload()}};
+
+/* ---------- Start ---------- */
+const oldGo=go;go=function(id){oldGo(id);if(id==='lab'&&!L.nodes.length)initLab('A')};
+upd();$$('#nav .nv')[0].classList.add('on');
+</script>
+</body>
+</html>
